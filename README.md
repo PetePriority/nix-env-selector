@@ -108,10 +108,11 @@ file (located in the root of the workspace). Here are the configuration settings
 | Setting                       | Default | Description                                                   |
 | ----------------------------- | ------- | ------------------------------------------------------------- |
 | `nixEnvSelector.nixFile`      | null    | Path to the Nix config file                                   |
+| `nixEnvSelector.devshell`     | null    | Selected devShell from flake                                  |
 | `nixEnvSelector.packages`     | []      | List packages using as `-p` nix-shell args                    |
 | `nixEnvSelector.args`         | null    | Custom args string for nix-shell. EX: `-A <something> --pure` |
 | `nixEnvSelector.nixShellPath` | null    | Custom path for nix-shell executable                          |
-| `nixEnvSelector.useFlakes` | false    | Enable support for `flake.nix`                          |
+| `nixEnvSelector.useFlakes`    | false   | Enable support for `flake.nix`                                |
 
 
 ## Supported Platforms

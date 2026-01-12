@@ -2,6 +2,14 @@
 
 All notable changes to the extension will be documented in this file.
 
+## [1.2.0]
+
+- Add support for devShell selection in Nix environment configuration [[ISSUE-104](https://github.com/arrterian/nix-env-selector/issues/104)]
+
+## [1.1.0]
+
+- Add suport for nix flakes [[PR-97](https://github.com/arrterian/nix-env-selector/pull/97)]
+
 ## [1.0.0]
 
 - Rewrite codebase with ClojureScript from scratch

@@ -8,9 +8,13 @@
 (defn unrender-workspace [path workspace-root]
   (s/replace path workspace-root "${workspaceFolder}"))
 
-(defn render-env-status [lang env-path]
-  (s/replace (-> lang :label :env-selected)
-             #"%ENV_NAME%"
-             (if env-path
-               (last (s/split env-path #"/"))
-               (-> lang :label :env-custom))))
+(defn render-env-status [lang env-path devshell]
+  (let [env-name (if env-path
+                   (last (s/split env-path #"/"))
+                   (-> lang :label :env-custom))
+        display-name (if devshell
+                       (str env-name "#" devshell)
+                       env-name)]
+    (s/replace (-> lang :label :env-selected)
+               #"%ENV_NAME%"
+               display-name)))

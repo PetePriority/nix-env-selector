@@ -8,7 +8,7 @@
 (defn ^:private list-to-args [pref-arg list]
   (s/join " " (map #(str pref-arg " " %1) list)))
 
-(defn ^:private has-flake? [dir]
+(defn has-flake? [dir]
   (let [fs (js/require "fs")]
     (try
       (.existsSync fs (str dir "/flake.nix"))
@@ -36,13 +36,15 @@
        (when args
          (str " " args))))
 
-(defn ^:private get-flake-env-cmd [{:keys [nix-path dir args]}]
+(defn ^:private get-flake-env-cmd [{:keys [nix-path dir args devshell]}]
   (str (if (empty? nix-path)
          "nix"
          (s/replace nix-path #" " "\\ "))
        " develop "
        (when dir
          (str "\"" dir "\""))
+       (when devshell
+         (str "#" devshell))
        " --command env"
        (when args
          (str " " args))))
@@ -56,6 +58,35 @@
                             (js/JSON.parse value)
                             (catch js/Error _ nil))]))))
        (filter not-empty)))
+
+(defn get-devshells-from-flake
+  "Query available devShells from a flake using nix flake show --json"
+  [flake-dir nix-path log-channel]
+  (let [cmd (str (if (empty? nix-path)
+                   "nix"
+                   (s/replace nix-path #" " "\\ "))
+                 " flake show --json \"" flake-dir "\"")]
+    (try
+      (w/write-log log-channel (str "Querying devShells from flake: " cmd))
+      (let [output (.toString (execSync (clj->js cmd {:cwd flake-dir})))
+            json-data (js/JSON.parse output)
+            devshells (.-devShells json-data)]
+        (if devshells
+          ;; Get all unique devShell names across all systems
+          (let [all-shells (->> (js/Object.values devshells)
+                                (mapcat #(js/Object.keys %))
+                                (into #{})
+                                (sort)
+                                (vec))]
+            (if (empty? all-shells)
+              ["default"]
+              all-shells))
+          ["default"]))
+      (catch js/Error e
+        (do
+          (w/write-log log-channel (str "Error querying devShells: " e))
+          ["default"])))))
+
 
 (defn ^:private parse-env-vars [output]
   (->> (s/split output #"\n")

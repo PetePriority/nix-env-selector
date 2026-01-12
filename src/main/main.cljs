@@ -22,11 +22,12 @@
                                      :packages       (:nix-packages @config)
                                      :args           (:nix-args @config)
                                      :nix-shell-path (:nix-shell-path @config)
-                                     :use-flakes     (:use-flakes @config)}
+                                     :use-flakes     (:use-flakes @config)
+                                     :devshell       (:devshell @config)}
                                     log-channel)
               (env/set-current-env))
           (->> status-bar
-              (status/show {:text    (render-env-status lang (:nix-file @config))
+              (status/show {:text    (render-env-status lang (:nix-file @config) (:devshell @config))
                             :command :nix-env-selector/select-env}))
           (catch :default e
             (w/write-log log-channel (str "Error applying environment: " e))))
